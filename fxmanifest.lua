@@ -4,7 +4,7 @@ lua54 'yes'
 
 name 'sd-interact'
 author 'Samuels Development'
-version '1.0.0'
+version '1.0.1'
 description 'Interact: minimal floating prompts on points, entities, models and bones, drawn into the world, keyboard and controller'
 
 shared_scripts {
