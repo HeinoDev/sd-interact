@@ -1,0 +1,11 @@
+{
+  "hold": "Hold",
+  "keymap": {
+    "interact": "Interact",
+    "next": "Interact: next option",
+    "prev": "Interact: previous option",
+    "interact_pad": "Interact (controller)",
+    "next_pad": "Interact: next option (controller)",
+    "prev_pad": "Interact: previous option (controller)"
+  }
+}

@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind utilities;
+
+/* The page is painted over the game: nothing may be opaque but the prompt itself. */
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+}
+
+:root {
+  --bone: #f8f8f6;
+  --ink: #141619;
+  --glass: rgba(16, 18, 22, 0.5);
+  --glass-edge: rgba(255, 255, 255, 0.18);
+  /* a tight dark edge for crispness, a wide soft one so it reads on a bright wall */
+  --shadow-text: 0 1px 1.5px rgba(0, 0, 0, 0.75), 0 0 2px rgba(0, 0, 0, 0.35), 0 0 18px rgba(0, 0, 0, 0.4);
+  font-family: 'Geist Sans', system-ui, sans-serif;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.canvas {
+  position: relative;
+  transform-origin: 0 0;
+}
+
+.prompt {
+  position: absolute;
+  inset: 0;
+  transform-origin: 48px 210px; /* the anchor: it grows from the point and shrinks back into it */
+}
+
+/* opening: out of the point with a little overshoot */
+.is-in {
+  animation: enter 240ms cubic-bezier(0.2, 1.35, 0.45, 1) both;
+}
+
+/* closing: a quick fade back into the point */
+.is-out {
+  animation: leave 150ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.drum {
+  position: absolute;
+  inset: 0;
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tile {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--glass);
+  box-shadow: inset 0 0 0 1px var(--glass-edge), 0 2px 8px rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+  transition:
+    opacity 180ms ease-out,
+    background-color 180ms ease-out,
+    color 180ms ease-out;
+}
+
+.tile-on {
+  border-radius: 11px;
+  background: var(--bone);
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.face {
+  display: grid;
+  place-items: center;
+}
+
+/* confirm: the tile gives under the press */
+.face-on {
+  animation: press 240ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+.hold-ring {
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  display: block;
+  overflow: visible;
+  color: var(--bone);
+  pointer-events: none;
+}
+
+.label {
+  position: absolute;
+  transform: translateY(-50%);
+  max-width: 600px;
+  text-shadow: var(--shadow-text);
+  animation: label-in 170ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.is-in .label {
+  animation-delay: 40ms;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.text {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 22px;
+}
+
+.desc {
+  margin-top: 2px;
+  max-width: 340px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 17px;
+  opacity: 0.8;
+  white-space: normal;
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hold {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* the key: a small tile of its own, white like the selected one */
+.chip {
+  display: inline-grid;
+  place-items: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  background: var(--bone);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.glyph {
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+@keyframes enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes leave {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes label-in {
+  from {
+    opacity: 0;
+    transform: translate(-6px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+@keyframes press {
+  0% {
+    transform: scale(0.82);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* the dev preview only (#mock): a game shot behind the prompt */
+.mock-bg {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
