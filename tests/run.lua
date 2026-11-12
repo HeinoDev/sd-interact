@@ -117,6 +117,9 @@ check('model hashes', points.get(mid).models[joaat('prop_a')] == true)
 local updated = points.update(id, { options = { { label = 'Only' } }, interactDistance = 2.5 })
 check('update', updated and #points.get(id).options == 1)
 
+points.update(id, { interactDistance = 8.0 })
+check('update keeps the point in range', points.get(id).distance == 8.0)
+
 local v0 = points.version
 points.removeResource('res_b')
 check('resource cleanup', points.get(id2) == nil and points.get(mid) == nil and points.get(id) ~= nil)
