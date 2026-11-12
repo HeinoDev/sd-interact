@@ -2,7 +2,7 @@
 
 # sd-interact
 
-<img width="960" alt="sd-interact banner: a vault wall, straight on, with an Open the vault prompt on the door being held" src="docs/previews/sd-interact-banner.webp">
+<img width="960" alt="sd-interact banner: a bank lobby straight on, an Open the vault prompt held on the vault door's wheel" src="docs/previews/sd-interact-banner.webp">
 
 sd-interact puts the interaction on the thing itself. Look at something you can use and a small prompt opens on it: an icon on the spot, what it does, and the key that does it. Several options stack on a drum you scroll. Hold options draw an outline round the tile as you hold, and on a controller the key becomes the pad button. It has its own API, and it can also answer ox_target, qtarget and qb-target calls, so the scripts you already run use it without changing a line.
 
