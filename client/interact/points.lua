@@ -300,6 +300,10 @@ function points.update(id, data)
         p.lineOfSight = data.lineOfSight == true
     end
 
+    if p.interactDistance > p.distance then
+        p.distance = p.interactDistance
+    end
+
     if data.coords and p.kind == 'coords' then
         p.coords = vec(data.coords) or p.coords
     end
