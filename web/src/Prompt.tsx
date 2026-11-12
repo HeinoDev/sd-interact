@@ -71,13 +71,41 @@ export function Prompt() {
   );
 }
 
+/** The hold outline: GAP px outside the selected tile, its corners the tile's radius plus the gap so the
+ *  spacing is even all the way round (the tile is TILE square with an 11px radius, styles.css .tile-on). */
+const GAP = 4;
+const OUTLINE = TILE + GAP * 2;
+const OUTLINE_R = 11 + GAP;
+const BOX = 56;
+
+/** The outline as one path that starts at the top centre and runs clockwise, so the fill does too. */
+function outlinePath() {
+  const lo = (BOX - OUTLINE) / 2;
+  const hi = lo + OUTLINE;
+  const mid = BOX / 2;
+  const r = OUTLINE_R;
+  return [
+    `M ${mid} ${lo}`,
+    `H ${hi - r}`,
+    `A ${r} ${r} 0 0 1 ${hi} ${lo + r}`,
+    `V ${hi - r}`,
+    `A ${r} ${r} 0 0 1 ${hi - r} ${hi}`,
+    `H ${lo + r}`,
+    `A ${r} ${r} 0 0 1 ${lo} ${hi - r}`,
+    `V ${lo + r}`,
+    `A ${r} ${r} 0 0 1 ${lo + r} ${lo}`,
+    'Z',
+  ].join(' ');
+}
+
+const OUTLINE_PATH = outlinePath();
+
 /**
- * The hold ring round the selected tile: empty, it fills clockwise over the hold's length; let go and it
- * runs back. Started a frame after mounting so the transition has a starting point.
+ * The hold outline round the selected tile, its own shape a little larger: empty, it fills clockwise from
+ * the top over the hold's length; let go and it runs back. Started a frame after mounting so the
+ * transition has a starting point.
  */
 function Ring({ ms, accent }: { ms: number; accent: string | null }) {
-  const r = 24;
-  const c = 2 * Math.PI * r;
   const [full, setFull] = useState(false);
   const raf = useRef(0);
   useEffect(() => {
@@ -87,27 +115,24 @@ function Ring({ ms, accent }: { ms: number; accent: string | null }) {
     return () => cancelAnimationFrame(raf.current);
   }, [ms]);
   return (
-    <svg className="hold-ring" width={56} height={56} viewBox="0 0 56 56" aria-hidden>
-      <circle
-        cx="28"
-        cy="28"
-        r={r}
+    <svg className="hold-ring" width={BOX} height={BOX} viewBox={`0 0 ${BOX} ${BOX}`} aria-hidden>
+      <path
+        d={OUTLINE_PATH}
         fill="none"
         stroke="rgba(0,0,0,.28)"
         strokeWidth="4"
         style={{ opacity: ms > 0 ? 1 : 0, transition: 'opacity 120ms' }}
       />
-      <circle
-        cx="28"
-        cy="28"
-        r={r}
+      <path
+        d={OUTLINE_PATH}
+        pathLength={100}
         fill="none"
         stroke={accent ?? 'currentColor'}
         strokeWidth="2.25"
         strokeLinecap="round"
-        strokeDasharray={c}
-        strokeDashoffset={full ? 0 : c}
-        transform="rotate(-90 28 28)"
+        strokeLinejoin="round"
+        strokeDasharray={100}
+        strokeDashoffset={full ? 0 : 100}
         style={{
           transition: full ? `stroke-dashoffset ${ms}ms linear` : 'stroke-dashoffset 180ms ease-out',
           opacity: ms > 0 || full ? 1 : 0,

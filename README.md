@@ -2,9 +2,9 @@
 
 # sd-interact
 
-<img width="960" alt="sd-interact banner: a prompt with three options, the third being held" src="docs/previews/sd-interact-banner.webp">
+<img width="960" alt="sd-interact banner: a vault wall, straight on, with an Open the vault prompt on the door being held" src="docs/previews/sd-interact-banner.webp">
 
-sd-interact puts the interaction on the thing itself. Look at something you can use and a small prompt opens on it: an icon on the spot, what it does, and the key that does it. Several options stack on a drum you scroll. Hold options fill a ring, and on a controller the key becomes the pad button. It has its own API, and it can also answer ox_target, qtarget and qb-target calls, so the scripts you already run use it without changing a line.
+sd-interact puts the interaction on the thing itself. Look at something you can use and a small prompt opens on it: an icon on the spot, what it does, and the key that does it. Several options stack on a drum you scroll. Hold options draw an outline round the tile as you hold, and on a controller the key becomes the pad button. It has its own API, and it can also answer ox_target, qtarget and qb-target calls, so the scripts you already run use it without changing a line.
 
 [![Stars](https://img.shields.io/github/stars/Samuels-Development/sd-interact?label=Stars&logo=github)](https://github.com/Samuels-Development/sd-interact)
 [![Discord](https://img.shields.io/discord/842045164951437383?label=Discord&logo=discord&logoColor=white)](https://discord.gg/FzPehMQaBQ)
@@ -27,7 +27,7 @@ If you're enjoying sd-interact and want to support my work, consider picking up 
 
 ## Preview
 
-<p align="center"><img src="docs/previews/prompt-demo.gif" alt="A prompt opening on a pistol, scrolling to Inspect, holding Seize until the ring fills, and closing" width="960" /></p>
+<p align="center"><img src="docs/previews/prompt-demo.gif" alt="A prompt opening on a pistol, scrolling to Inspect, holding Seize while the outline fills, and closing" width="960" /></p>
 
 <p align="center"><sub>Recorded from the prompt page itself (the same page the game draws), over a rendered room.</sub></p>
 
@@ -47,7 +47,7 @@ The rooms are rendered in Blender. The prompts are captured from the page and pl
 
 - **On the thing, not on the screen.** The prompt is painted into the game's own frame at the point (an off-screen page drawn with `DrawSprite`). It stays pinned to the world with no lag, and it renders at the screen's own resolution, so its text stays sharp.
 - **Quiet until you need it.** Only the point nearest the middle of the screen opens. Other points in range show as small dots, a ring once you're close enough, and dots that crowd together merge into one. A prompt behind a wall doesn't open.
-- **Press, scroll, hold.** Options stack on a drum, and the one on the point is the one the key uses. An option can ask to be held, with a ring that fills and runs back if you let go. It can carry a second line, or change its label as things change ("Rack Assault Rifle").
+- **Press, scroll, hold.** Options stack on a drum, and the one on the point is the one the key uses. An option can ask to be held: an outline runs round its tile as you hold and runs back if you let go. It can carry a second line, or change its label as things change ("Rack Assault Rifle").
 - **Keyboard and controller.** Confirm, next and previous are FiveM key mappings (E and the wheel, the d-pad on a pad), so every player can rebind them in Settings > Key Bindings > FiveM. The prompt shows whichever device you're using.
 - **Anything you can point at.** Coordinates, local or networked entities (on an offset or a bone), every entity of some models, or every vehicle, ped, object or player nearby.
 - **A stand-in for the target you use.** Turned on, it answers `exports.ox_target`, `exports.qtarget` and `exports['qb-target']` with prompts: zones, entities, models, bones, global options, item, job and gang checks, and every way of handling an option.
