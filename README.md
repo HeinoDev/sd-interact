@@ -13,7 +13,7 @@ sd-interact puts the interaction on the thing itself. Look at something you can 
 ![Input](https://img.shields.io/badge/Input-keyboard%20%7C%20controller-3b82f6)
 ![Stands in for](https://img.shields.io/badge/Stands%20in%20for-ox__target%20%7C%20qtarget%20%7C%20qb--target-3b82f6)
 
-[**Store**](https://fivem.samueldev.shop) · [**Discord**](https://discord.gg/FzPehMQaBQ)
+[**Download**](https://github.com/Samuels-Development/sd-interact/releases/latest) · [**Docs**](https://docs.samueldev.shop/resources/interact/) · [**Store**](https://fivem.samueldev.shop) · [**Discord**](https://discord.gg/FzPehMQaBQ)
 
 **Works together:** **sd-interact** · [**sd-gunracks**](https://github.com/Samuels-Development/sd-gunracks)
 
@@ -63,127 +63,70 @@ The rooms are rendered in Blender. The prompts are captured from the page and pl
 
 ## Installation
 
+Download **`sd-interact.zip`** from the [latest release](https://github.com/Samuels-Development/sd-interact/releases/latest) and unzip it into your resources folder: it is the resource with its prompt page already built, ready to drop in. Start it after ox_lib, and before the resources that add prompts:
+
 ```cfg
 ensure ox_lib
 ensure sd-interact
 ```
 
-Then go through `configs/client/`: distances, how the focused point is chosen, the default keys, the prompt's size, and the dots.
+> [!IMPORTANT]
+> Download the `sd-interact.zip` asset, not **Source code (zip)** or the green **Code** button. Those are the source, without the built page: the resource would start, but no prompt would ever draw until you [build it yourself](#building-from-source).
 
-## Adding prompts
+Distances, the default keys, the prompt's size and the dots are in `configs/client/`.
+
+## Documentation
+
+The full guide is at **[docs.samueldev.shop/resources/interact](https://docs.samueldev.shop/resources/interact/)**:
+
+| | |
+|---|---|
+| [Installation](https://docs.samueldev.shop/resources/interact/installation) | Start order, a first prompt to check it works, rebinding keys |
+| [Adding prompts](https://docs.samueldev.shop/resources/interact/adding-prompts) | Points, distances, where the prompt sits, options, who sees them, what they do |
+| [Examples](https://docs.samueldev.shop/resources/interact/examples) | A shopkeeper, every ATM, a car's boot that says Open or Close, police-only options, item checks, server entities, moving over from ox_target |
+| [Client exports](https://docs.samueldev.shop/resources/interact/exports-client) | Every export with its parameters and what it returns |
+| [Configuration](https://docs.samueldev.shop/resources/interact/configuration) | Every option in `configs/client/` |
+| [Replacing ox_target / qb-target](https://docs.samueldev.shop/resources/interact/target-compatibility) | Answering their exports, what is supported, the known differences |
+
+A first prompt, to see the shape of it:
 
 ```lua
-local id = exports['sd-interact']:addCoords(vec3(441.0, -978.0, 30.7), {
+exports['sd-interact']:addLocalEntity(ped, {
+    offset = vec3(0.0, 0.0, 0.3),
     options = {
-        { label = 'Open the locker', icon = 'fa-solid fa-box-open', onSelect = function(data) ... end },
-        { label = 'Search it', icon = 'search', hold = 1500, event = 'myres:search' },
+        { label = 'Browse the shop', icon = 'fa-solid fa-basket-shopping', serverEvent = 'myshop:open' },
+        { label = 'Rob the till', icon = 'fa-solid fa-sack-dollar', hold = 3000, groups = { ballas = 0 }, onSelect = robTill },
     },
-    distance = 7.0,          -- shows (as a dot) within this many metres
-    interactDistance = 2.6,  -- opens within this many
 })
-
-exports['sd-interact']:addLocalEntity(entity, { options = { ... }, offset = vec3(0.0, -0.3, 0.9) })
-exports['sd-interact']:addLocalEntity(vehicle, { options = { ... }, bone = 'boot' })
-exports['sd-interact']:addEntity(netId, { options = { ... } })
-exports['sd-interact']:addModel({ 'prop_atm_01', 'prop_atm_02' }, { options = { ... } })
-exports['sd-interact']:addGlobalVehicle({ options = { ... } })   -- also addGlobalPed / Object / Player
 ```
 
-Every `add*` returns the point's id. A point belongs to the resource that added it and goes when that resource stops.
-
-```lua
-exports['sd-interact']:update(id, { options = { ... }, interactDistance = 2.5 })
-exports['sd-interact']:remove(id)
-exports['sd-interact']:removeLocalEntity(entity, name?)   -- also removeEntity, removeModel, removeGlobal*
-exports['sd-interact']:disable(true)    -- hide every prompt while your minigame runs; false brings them back
-exports['sd-interact']:getFocus()       -- { id, entity, coords, option } of the open prompt, or nil
-```
-
-A point is measured to its middle, but a player reaches for its near side (a shopkeeper behind a counter, a car's door), so `Slack` in `configs/client/interact.lua` (0.75 m) is added to every distance a prompt is allowed at.
-
-### Point fields
-
-| Field | |
-|---|---|
-| `options` | the options, in order (a single option table also works) |
-| `distance` | metres within which the point shows as a dot (default 7) |
-| `interactDistance` | metres within which its prompt opens (default 2.6) |
-| `offset` | from the entity, in its own space (entity points), or added to the coords |
-| `bone` | a bone name or index: the prompt rides it (a door, a boot) |
-| `lineOfSight` | `false` lets the prompt open through walls (default `true`) |
-| `allowInVehicle` | `true` keeps it while the player sits in a vehicle |
-| `groups` | jobs or gangs: `'police'`, `{ 'police', 'ambulance' }` or `{ police = 2 }` |
-| `name` | for `remove*(…, name)` |
-
-### Option fields
-
-The same handler fields as an ox_target option, so option tables move over as they are.
-
-| Field | |
-|---|---|
-| `label` | what it does, in sentence case: "Take Pump Shotgun" |
-| `icon` | Font Awesome classes (`'fa-solid fa-gun'`, `'fas fa-box'`) or a Lucide icon name (`'phone'`) |
-| `description` | a second, smaller line under the label |
-| `hold` | milliseconds to hold the key instead of pressing it |
-| `distance` | this option needs the player closer than the point's `interactDistance` |
-| `groups` | as on the point, for this option |
-| `canInteract(entity, coords, args, distance)` | return `false` to hide it; a second return value is the label to show now |
-| `onSelect(data)` | `data = { id, name, entity, coords, distance, args }` |
-| `export` | `'resource.exportName'`, called with `data` |
-| `event` / `serverEvent` | triggered with `data` (the server gets the entity as its network id) |
-| `command` | run with `ExecuteCommand` |
-| `args` | passed through to `canInteract` and the handler |
+Options take ox_target's handler fields (`onSelect`, `export`, `event`, `serverEvent`, `command`) and `groups`, so option tables move over as they are.
 
 ## Replacing ox_target, qtarget or qb-target
 
-Scripts written for a target resource can use prompts without being changed.
+Scripts written for a target resource can use prompts without being changed. Name the ones to answer in your `server.cfg`, before `ensure sd-interact`, then take the real resource out of your server (two resources answering one export fight):
 
-1. Name the ones to answer in your server.cfg, before `ensure sd-interact`:
+```cfg
+setr sd_interact:replace "ox_target,qtarget"
+ensure sd-interact
+```
 
-   ```cfg
-   setr sd_interact:replace "ox_target,qtarget"
-   ```
-
-2. Take the real resource out of your server. Two resources answering one export fight, so never run both.
-3. Scripts that list it as a dependency need something by that name to start. Either uncomment its `provide` line in sd-interact's `fxmanifest.lua`, or add an empty stand-in resource with that name. With the stand-in, `GetResourceState('ox_target')` reports `started`, so scripts that look for ox_target before using it find it.
-
-   ```lua
-   -- resources/ox_target/fxmanifest.lua
-   fx_version 'cerulean'
-   game 'gta5'
-   version '1.17.2'            -- the ox_target API sd-interact answers
-   sd_interact_stand_in 'yes'  -- sd-interact recognises it and doesn't warn
-   dependency 'sd-interact'
-   ```
-
-sd-interact then answers `exports.ox_target:addBoxZone(...)`, `exports['qb-target']:AddTargetModel(...)` and the rest:
-
-- **Where prompts go.** Zones become a prompt at their middle. Entities, models and globals get a prompt on the entity (on its bones, for options with `bones` or `AddTargetBone`). Self targets (`addSelfTarget`) open on your own ped when you look down at it.
-- **Checks.** `groups`, `items` and `anyItem`, `job`, `gang`, `item` and `citizenid` all keep working, and so does `canInteract`, called with each resource's own arguments.
-- **Handlers.** Each one gets the data its own resource would give it. That covers `onSelect` and `action`, `export` (on the resource that added the option), `event` and `serverEvent`, `command`, and qb's `type = 'client' | 'server' | 'command' | 'qbcommand'`.
-- **Removing.** Removal works by option name (ox) or label (qb), and the ox_target and qtarget layers keep their points apart.
-
-### Known differences
-
-- ox_target's `offset` without `absoluteOffset` is a fraction of the model's size; here it is metres.
-- Submenus (`menuName` / `openMenu`) show flat, with the other options.
-- qb-target's `job = 'all'`, `excludejob`, `jobType`, `excludejobType` and `excludegang` aren't read yet.
-- `getTargetOptions()` with no entity answers for the open prompt, since there is no target eye.
+Scripts that list ox_target as a dependency also need something by that name to start: an empty stand-in resource or a `provide` line. Both, every supported export, and the known differences are on [Replacing ox_target / qb-target](https://docs.samueldev.shop/resources/interact/target-compatibility).
 
 ## For developers
 
-### The prompt page
+### Building from source
 
-The prompt is a React page in `web/`, drawn by the game as an off-screen page (a DUI). The built page ships in `web/build`.
+The repository is the source: the built prompt page (`web/build`) is not committed, and each [release](https://github.com/Samuels-Development/sd-interact/releases) builds it into its zip. To run a clone, or after changing the page, build it with Node.js (LTS):
 
 ```bash
 cd web
 npm ci
-npm run dev     # then open http://localhost:5173/#mock: a scripted run of every state (#mock&step=0..4 freezes one)
 npm run build   # what the game draws (web/build)
+npm run dev     # the page in a browser: /#mock runs through every state (#mock&step=0..4 freezes one)
 ```
 
-`#shot=<messages>` shows one state, given as the same JSON messages the game sends, for pictures like the ones above. `CANVAS` and `ANCHOR` in `web/src/Prompt.tsx` must match `Canvas` and `Anchor` in `configs/client/draw.lua`.
+A source zip unpacks to `sd-interact-main`: rename the folder to `sd-interact`, the name its exports are called by. `#shot=<messages>` shows one state, given as the JSON messages the game sends, for pictures like the ones above. `CANVAS` and `ANCHOR` in `web/src/Prompt.tsx` must match `Canvas` and `Anchor` in `configs/client/draw.lua`.
 
 ### Tests
 
