@@ -81,6 +81,7 @@ l = { cand('side', 0.6, 0.5, 1.0), cand('up', 0.5, 0.4, 1.0) }
 check('aspect corrected', focus.choose(l, nil, A, 0.22, 0.03).key == 'up')
 
 -- the registry
+lib = { print = { warn = function() end } }
 package.loaded['configs.config'] = { Interact = { Distance = 5.0, InteractDistance = 1.8, LineOfSight = true } }
 local points = dofile('client/interact/points.lua')
 
@@ -119,6 +120,9 @@ check('update', updated and #points.get(id).options == 1)
 
 points.update(id, { interactDistance = 8.0 })
 check('update keeps the point in range', points.get(id).distance == 8.0)
+
+points.update(id, { distance = 0, interactDistance = 0 })
+check('update accepts zero distances', points.get(id).distance == 0 and points.get(id).interactDistance == 0)
 
 local v0 = points.version
 points.removeResource('res_b')

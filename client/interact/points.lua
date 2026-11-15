@@ -317,11 +317,11 @@ function points.update(id, data)
         p.options = options
     end
 
-    if data.distance then
+    if data.distance ~= nil then
         p.distance = tonumber(data.distance) or p.distance
     end
 
-    if data.interactDistance then
+    if data.interactDistance ~= nil then
         p.interactDistance = tonumber(data.interactDistance) or p.interactDistance
     end
 
