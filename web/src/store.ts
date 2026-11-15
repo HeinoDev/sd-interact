@@ -15,6 +15,7 @@ export type KeyHint = { device: 'keyboard' | 'pad'; key: string };
 type State = {
   scale: number;
   holdWord: string;
+  scrollWord: string;
   accent: string | null;
   /** The point being shown. */
   id: string | null;
@@ -35,6 +36,7 @@ type State = {
 export const usePrompt = create<State>(() => ({
   scale: 1,
   holdWord: 'Hold',
+  scrollWord: 'Scroll to browse',
   accent: null,
   id: null,
   options: [],
@@ -48,7 +50,7 @@ export const usePrompt = create<State>(() => ({
 
 /** Every message the game sends the page (SendDuiMessage, JSON). */
 export type Message =
-  | { type: 'init'; scale?: number; hold?: string; accent?: string | null }
+  | { type: 'init'; scale?: number; hold?: string; scroll?: string; accent?: string | null }
   | { type: 'show'; id: string; options: PromptOption[]; selected?: number; key?: KeyHint; mode?: 'enter' | 'swap' }
   | { type: 'select'; selected: number }
   | { type: 'key'; key: KeyHint }
@@ -65,7 +67,7 @@ export function handle(m: Message) {
   const set = usePrompt.setState;
   switch (m.type) {
     case 'init':
-      set({ scale: m.scale ?? 1, holdWord: m.hold ?? 'Hold', accent: m.accent ?? null });
+      set({ scale: m.scale ?? 1, holdWord: m.hold ?? 'Hold', scrollWord: m.scroll ?? 'Scroll to browse', accent: m.accent ?? null });
       break;
     case 'show':
       window.clearTimeout(leaveTimer);

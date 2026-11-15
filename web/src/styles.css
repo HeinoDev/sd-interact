@@ -134,6 +134,12 @@ body,
   white-space: normal;
 }
 
+.scroll-hint {
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: 0.75;
+}
+
 .hint {
   display: inline-flex;
   align-items: center;

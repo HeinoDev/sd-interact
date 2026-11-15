@@ -1,5 +1,6 @@
 {
   "hold": "Hold",
+  "scroll": "Scroll to browse",
   "keymap": {
     "interact": "Interact",
     "next": "Interact: next option",

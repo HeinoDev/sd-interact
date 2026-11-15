@@ -63,7 +63,7 @@ function dui.ensure()
         Wait(0)
     end
 
-    send({ type = 'init', scale = scale, hold = locale('hold'), accent = DRAW.Accent })
+    send({ type = 'init', scale = scale, hold = locale('hold'), scroll = locale('scroll'), accent = DRAW.Accent })
 end
 
 function dui.destroy()

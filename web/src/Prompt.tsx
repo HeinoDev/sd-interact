@@ -24,7 +24,7 @@ const FADE = [1, 0.5];
  * closes, and moving to a neighbouring point (`swap`) only swaps the label.
  */
 export function Prompt() {
-  const { id, options, selected, key, holding, pulse, holdWord, accent, epoch, leaving } = usePrompt();
+  const { id, options, selected, key, holding, pulse, holdWord, scrollWord, accent, epoch, leaving } = usePrompt();
   if (!id || options.length === 0) return null;
   const current = options[Math.min(selected, options.length - 1)];
 
@@ -66,6 +66,7 @@ export function Prompt() {
           </span>
         </div>
         {current.description ? <div className="desc">{current.description}</div> : null}
+        {options.length > 1 ? <div className="scroll-hint">{scrollWord}</div> : null}
       </div>
     </div>
   );
