@@ -1,0 +1,12 @@
+{
+  "hold": "Hold",
+  "scroll": "Bla for å bla gjennom",
+  "keymap": {
+    "interact": "Samhandle",
+    "next": "Samhandle: neste valg",
+    "prev": "Samhandle: forrige valg",
+    "interact_pad": "Samhandle (kontroller)",
+    "next_pad": "Samhandle: neste valg (kontroller)",
+    "prev_pad": "Samhandle: forrige valg (kontroller)"
+  }
+}
