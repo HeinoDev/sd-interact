@@ -322,6 +322,7 @@ local function frameThread()
             local from = GetEntityCoords(ped)
             local cam = GetFinalRenderedCamCoord()
             local aspect = dui.aspect()
+            local now = GetGameTimer()
 
             -- where each is this frame
             for _, c in ipairs(list) do
@@ -333,18 +334,20 @@ local function frameThread()
                 local on, sx, sy = GetScreenCoordFromWorldCoord(c.pos.x, c.pos.y, c.pos.z)
                 c.onScreen = on == 1 or on == true
                 c.sx, c.sy = sx, sy
-                c.blocked = nil
+                local s = sight[c.key]
+                c.blocked = c.point.lineOfSight and s and not s.clear and now - s.at < CFG.LosEveryMs
             end
 
             -- who gets the prompt (the first pick hidden behind something gives way to the next)
             local current = state.focus and state.focus.key
-            local pick = focus.choose(list, current, aspect, CFG.FocusRadius, CFG.Stickiness)
+            local pick
 
             for _ = 1, 3 do
+                pick = focus.choose(list, current, aspect, CFG.FocusRadius, CFG.Stickiness)
                 if not pick or not pick.point.lineOfSight or canSee(pick, cam) then break end
 
                 pick.blocked = true
-                pick = focus.choose(list, current, aspect, CFG.FocusRadius, CFG.Stickiness)
+                pick = nil
             end
 
             if pick then
@@ -354,8 +357,6 @@ local function frameThread()
             end
 
             -- which device the player is on (the key glyph follows it)
-            local now = GetGameTimer()
-
             if now - lastDevice > 250 then
                 lastDevice = now
                 local device = IsUsingKeyboard(2) and 'keyboard' or 'pad'
