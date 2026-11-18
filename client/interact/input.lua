@@ -36,7 +36,7 @@ function input.hint()
     return { device = 'keyboard', key = text }
 end
 
----Stop a hold in progress (released early, or the prompt went away).
+---Stop a hold when the player lets go or the prompt changes.
 function input.cancelHold()
     if state.holding then
         state.holding = nil
@@ -65,20 +65,23 @@ local function press()
         return
     end
 
-    local h = { key = c.key, index = state.selected, started = GetGameTimer(), ms = o.hold }
+    local h = { key = c.key, index = state.selected, option = o, started = GetGameTimer(), ms = o.hold }
     state.holding = h
     dui.hold(o.hold)
 
     CreateThread(function()
         while state.holding == h do
+            local f = state.focus
+            local current = f and f.options[h.index]
+
+            if not current or f.key ~= h.key or state.selected ~= h.index or current.option ~= h.option then
+                input.cancelHold()
+                return
+            end
+
             if GetGameTimer() - h.started >= h.ms then
                 state.holding = nil
-                local f = state.focus
-
-                if f and f.key == h.key and state.selected == h.index and f.options[h.index] then
-                    confirmed(f, f.options[h.index].option)
-                end
-
+                confirmed(f, h.option)
                 return
             end
 
